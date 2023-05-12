@@ -3,21 +3,6 @@ import { Maximize } from "react-feather";
 import { useTranslation } from "react-i18next";
 import { English, Español } from "../../constant";
 
-import {
-  EthereumClient,
-  modalConnectors,
-  walletConnectProvider,
-} from "@web3modal/ethereum";
-
-import { Web3Modal } from "@web3modal/react";
-
-import { configureChains, createClient, WagmiConfig } from "wagmi";
-
-import { mainnet, goerli } from "wagmi/chains";
-
-import { Web3Button } from "@web3modal/react";
-
-import { useWeb3ModalTheme } from "@web3modal/react";
 
 const Rightbar = () => {
   const [langdropdown, setLangdropdown] = useState(false);
@@ -25,22 +10,6 @@ const Rightbar = () => {
   const { i18n } = useTranslation();
   const [selected, setSelected] = useState("en");
 
-  const { theme } = useWeb3ModalTheme({ themeColor: "green" });
-
-  const chains = [goerli];
-
-  // Wagmi client
-  const { provider } = configureChains(chains, [
-    walletConnectProvider({ projectId: "0362f8d274dc11c77f6862bd8f264390" }),
-  ]);
-  const wagmiClient = createClient({
-    autoConnect: true,
-    connectors: modalConnectors({ appName: "Private Garden", chains }),
-    provider,
-  });
-
-  // Web3Modal Ethereum Client
-  const ethereumClient = new EthereumClient(wagmiClient, chains);
 
   const changeLanguage = (lng) => {
     i18n.changeLanguage(lng);
@@ -157,11 +126,7 @@ const Rightbar = () => {
             </a>
           </li>
           <li className="profile-nav onhover-dropdown p-0">
-            <Web3Button />
-            <Web3Modal
-              projectId="0362f8d274dc11c77f6862bd8f264390"
-              ethereumClient={ethereumClient}
-            />
+            {/* Wallet Connect Button */}
           </li>
         </ul>
       </div>
