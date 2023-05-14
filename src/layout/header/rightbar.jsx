@@ -2,6 +2,7 @@ import React, { Fragment, useState, useEffect } from "react";
 import { Maximize } from "react-feather";
 import { useTranslation } from "react-i18next";
 import { English, Español } from "../../constant";
+import { WalletButton } from "./walletButton";
 
 
 const Rightbar = () => {
@@ -125,8 +126,9 @@ const Rightbar = () => {
               <Maximize />
             </a>
           </li>
-          <li className="profile-nav onhover-dropdown p-0">
+          <li>
             {/* Wallet Connect Button */}
+            <WalletButton/>
           </li>
         </ul>
       </div>
