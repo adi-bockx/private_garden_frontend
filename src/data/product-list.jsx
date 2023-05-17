@@ -49,87 +49,24 @@ const productColumns = [
     center: true,
   },
 ];
+
 const productData = [
   {
-    product_name: "TNX000157",
-    product_desc: "Interchargebla lens Digital Camera with APS-C-X Trans CMOS Sens",
-    amount: "$10",
-    stock: <div className='font-success'>Deposit</div>,
-    pay_from: "Pay with BNB",
-    start_date: "2022/4/19",
-    action: <div><span><i className="fa fa-trash" style={{ width: 35, fontSize: 16, padding: 11, color: '#e4566e' }}></i></span>
-      <span><i className="fa fa-pencil" style={{ width: 35, fontSize: 16, padding: 11, color: 'rgb(40, 167, 69)' }}></i></span>
-    </div>
-
-  },
-  {
-    
-    product_name: "TNX000157",
-    product_desc: "Interchargebla lens Digital Camera with APS-C-X Trans CMOS Sens",
-    amount: "$10",
-    stock: <div className='font-danger'>Withdraw</div>,
-    pay_from: "Pay with BNB",
-    start_date: "2022/4/19",
+    product_name: "AD",
+    amount: "ADI",
+    stock: <div className='font-success'>Invested</div>,
+    pay_from: "Pay with USDT",
+    start_date: "Date",
     action: <div><span><i className="fa fa-trash" style={{ width: 35, fontSize: 16, padding: 11, color: '#e4566e' }}></i></span>
       <span><i className="fa fa-pencil" style={{ width: 35, fontSize: 16, padding: 11, color: 'rgb(40, 167, 69)' }}></i></span>
     </div>
   },
   {
-    
-    product_name: "TNX000157",
-    product_desc: "Interchargebla lens Digital Camera with APS-C-X Trans CMOS Sens",
-    amount: "$10",
-    stock: <div className='font-danger'>Withdraw</div>,
-    pay_from: "Pay with BNB",
-    start_date: "2022/4/19",
-    action: <div><span><i className="fa fa-trash" style={{ width: 35, fontSize: 16, padding: 11, color: '#e4566e' }}></i></span>
-      <span><i className="fa fa-pencil" style={{ width: 35, fontSize: 16, padding: 11, color: 'rgb(40, 167, 69)' }}></i></span>
-    </div>
-  },
-  {
-    
-    product_name: "TNX000157",
-    product_desc: "Interchargebla lens Digital Camera with APS-C-X Trans CMOS Sens",
-    amount: "$20",
-    stock: <div className='font-primary'>Reward</div>,
-    pay_from: "Pay with BNB",
-    start_date: "2022/4/19",
-    action: <div><span><i className="fa fa-trash" style={{ width: 35, fontSize: 16, padding: 11, color: '#e4566e' }}></i></span>
-      <span><i className="fa fa-pencil" style={{ width: 35, fontSize: 16, padding: 11, color: 'rgb(40, 167, 69)' }}></i></span>
-    </div>
-  },
-  {
-    
-    product_name: "TNX000157",
-    product_desc: "Interchargebla lens Digital Camera with APS-C-X Trans CMOS Sens",
-    amount: "$30",
-    stock: <div className='font-success'>Deposit</div>,
-    pay_from: "Pay with BNB",
-    start_date: "2022/4/19",
-    action: <div><span><i className="fa fa-trash" style={{ width: 35, fontSize: 16, padding: 11, color: '#e4566e' }}></i></span>
-      <span><i className="fa fa-pencil" style={{ width: 35, fontSize: 16, padding: 11, color: 'rgb(40, 167, 69)' }}></i></span>
-    </div>
-  },
-  {
-    
-    product_name: "TNX000157",
-    product_desc: "Interchargebla lens Digital Camera with APS-C-X Trans CMOS Sens",
-    amount: "$10",
-    stock: <div className='font-success'>Deposit</div>,
-    pay_from: "Pay with BNB",
-    start_date: "2022/4/19",
-    action: <div><span><i className="fa fa-trash" style={{ width: 35, fontSize: 16, padding: 11, color: '#e4566e' }}></i></span>
-      <span><i className="fa fa-pencil" style={{ width: 35, fontSize: 16, padding: 11, color: 'rgb(40, 167, 69)' }}></i></span>
-    </div>
-  },
-  {
-    
-    product_name: "TNX000157",
-    product_desc: "Interchargebla lens Digital Camera with APS-C-X Trans CMOS Sens",
-    amount: "$10",
-    stock: <div className='font-success'>Deposit</div>,
-    pay_from: "Pay with BNB",
-    start_date: "2022/4/19",
+    product_name: "AD",
+    amount: "ADI",
+    stock: <div className='font-success'>Invested</div>,
+    pay_from: "Pay with USDT",
+    start_date: "Date",
     action: <div><span><i className="fa fa-trash" style={{ width: 35, fontSize: 16, padding: 11, color: '#e4566e' }}></i></span>
       <span><i className="fa fa-pencil" style={{ width: 35, fontSize: 16, padding: 11, color: 'rgb(40, 167, 69)' }}></i></span>
     </div>
@@ -140,6 +77,9 @@ const productData = [
 export const TransactionsList = () => {
   const { address, isConnecting, isDisconnected } = useAccount();
   //const [txData, setTxData] = useState();
+
+  const [ trxData, setTrxData ] = useState([]);
+
   useEffect(() => {
      getTransactionHistory();
   },[]);
@@ -194,8 +134,8 @@ export const TransactionsList = () => {
       const timestamp = block.timestamp;
       let date = new Date(timestamp * 1000).toLocaleString();
 
-     
-      let obj = {
+
+      data.push({
         product_name: tx.transactionHash.slice(0,12),
         amount: tx.returnValues.amount/10e18,
         stock: <div className='font-success'>Invested</div>,
@@ -204,16 +144,15 @@ export const TransactionsList = () => {
         action: <div><span><i className="fa fa-trash" style={{ width: 35, fontSize: 16, padding: 11, color: '#e4566e' }}></i></span>
           <span><i className="fa fa-pencil" style={{ width: 35, fontSize: 16, padding: 11, color: 'rgb(40, 167, 69)' }}></i></span>
         </div>
-      }
-
-      data.push(obj);
+      });
       
     }
-    console.log("data",data);
+    // console.log("data",data); 
+    setTrxData(data);
   }
 
   return(
-    <DataTable columns={productColumns} data={productData}/>
+    <DataTable columns={productColumns} data={trxData}/>
     // <div>{txData[0].product_name}</div>
   );
 
