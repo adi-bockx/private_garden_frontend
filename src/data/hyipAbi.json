@@ -1,0 +1,420 @@
+[
+    {
+      "inputs": [
+        {
+          "internalType": "address",
+          "name": "_usdt",
+          "type": "address"
+        },
+        {
+          "internalType": "address",
+          "name": "_pvgn",
+          "type": "address"
+        }
+      ],
+      "stateMutability": "nonpayable",
+      "type": "constructor"
+    },
+    {
+      "anonymous": false,
+      "inputs": [
+        {
+          "indexed": false,
+          "internalType": "uint256",
+          "name": "amount",
+          "type": "uint256"
+        },
+        {
+          "indexed": false,
+          "internalType": "uint256",
+          "name": "timestamp",
+          "type": "uint256"
+        }
+      ],
+      "name": "FeesClaimed",
+      "type": "event"
+    },
+    {
+      "anonymous": false,
+      "inputs": [
+        {
+          "indexed": true,
+          "internalType": "address",
+          "name": "investor",
+          "type": "address"
+        },
+        {
+          "indexed": true,
+          "internalType": "enum HYIP.GardenTier",
+          "name": "pool",
+          "type": "uint8"
+        },
+        {
+          "indexed": false,
+          "internalType": "uint256",
+          "name": "amount",
+          "type": "uint256"
+        }
+      ],
+      "name": "Invested",
+      "type": "event"
+    },
+    {
+      "anonymous": false,
+      "inputs": [
+        {
+          "indexed": true,
+          "internalType": "address",
+          "name": "user",
+          "type": "address"
+        },
+        {
+          "indexed": true,
+          "internalType": "enum HYIP.GardenTier",
+          "name": "garden",
+          "type": "uint8"
+        },
+        {
+          "indexed": false,
+          "internalType": "uint256",
+          "name": "amount",
+          "type": "uint256"
+        },
+        {
+          "indexed": false,
+          "internalType": "uint256",
+          "name": "timestamp",
+          "type": "uint256"
+        }
+      ],
+      "name": "InvestmentWithdrawn",
+      "type": "event"
+    },
+    {
+      "anonymous": false,
+      "inputs": [
+        {
+          "indexed": true,
+          "internalType": "address",
+          "name": "previousOwner",
+          "type": "address"
+        },
+        {
+          "indexed": true,
+          "internalType": "address",
+          "name": "newOwner",
+          "type": "address"
+        }
+      ],
+      "name": "OwnershipTransferred",
+      "type": "event"
+    },
+    {
+      "anonymous": false,
+      "inputs": [
+        {
+          "indexed": true,
+          "internalType": "address",
+          "name": "investor",
+          "type": "address"
+        },
+        {
+          "indexed": true,
+          "internalType": "enum HYIP.GardenTier",
+          "name": "pool",
+          "type": "uint8"
+        },
+        {
+          "indexed": false,
+          "internalType": "uint256",
+          "name": "amount",
+          "type": "uint256"
+        }
+      ],
+      "name": "StakeClaimed",
+      "type": "event"
+    },
+    {
+      "inputs": [],
+      "name": "REWARD_PER_TOKEN",
+      "outputs": [
+        {
+          "internalType": "uint256",
+          "name": "",
+          "type": "uint256"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "claimFee",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "enum HYIP.GardenTier",
+          "name": "_pool",
+          "type": "uint8"
+        }
+      ],
+      "name": "claimStake",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "feeToBeClaimed",
+      "outputs": [
+        {
+          "internalType": "uint256",
+          "name": "",
+          "type": "uint256"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "enum HYIP.GardenTier",
+          "name": "_pool",
+          "type": "uint8"
+        },
+        {
+          "internalType": "uint256",
+          "name": "_amount",
+          "type": "uint256"
+        }
+      ],
+      "name": "invest",
+      "outputs": [],
+      "stateMutability": "payable",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "address",
+          "name": "",
+          "type": "address"
+        },
+        {
+          "internalType": "enum HYIP.GardenTier",
+          "name": "",
+          "type": "uint8"
+        }
+      ],
+      "name": "investments",
+      "outputs": [
+        {
+          "internalType": "uint256",
+          "name": "startTime",
+          "type": "uint256"
+        },
+        {
+          "internalType": "uint256",
+          "name": "endTime",
+          "type": "uint256"
+        },
+        {
+          "internalType": "uint256",
+          "name": "lastClaimTime",
+          "type": "uint256"
+        },
+        {
+          "internalType": "enum HYIP.PaymentMode",
+          "name": "paymentMode",
+          "type": "uint8"
+        },
+        {
+          "internalType": "uint256",
+          "name": "amount",
+          "type": "uint256"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "masterPool",
+      "outputs": [
+        {
+          "internalType": "uint256",
+          "name": "minimumInvestment",
+          "type": "uint256"
+        },
+        {
+          "internalType": "uint256",
+          "name": "maximumInvestment",
+          "type": "uint256"
+        },
+        {
+          "internalType": "uint256",
+          "name": "balanceLockedTime",
+          "type": "uint256"
+        },
+        {
+          "internalType": "uint256",
+          "name": "dailyProfitBps",
+          "type": "uint256"
+        },
+        {
+          "internalType": "uint256",
+          "name": "monthlyProfitBps",
+          "type": "uint256"
+        },
+        {
+          "internalType": "uint256",
+          "name": "totalROIBps",
+          "type": "uint256"
+        },
+        {
+          "internalType": "bool",
+          "name": "canReturnInvestment",
+          "type": "bool"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "owner",
+      "outputs": [
+        {
+          "internalType": "address",
+          "name": "",
+          "type": "address"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "proPool",
+      "outputs": [
+        {
+          "internalType": "uint256",
+          "name": "minimumInvestment",
+          "type": "uint256"
+        },
+        {
+          "internalType": "uint256",
+          "name": "maximumInvestment",
+          "type": "uint256"
+        },
+        {
+          "internalType": "uint256",
+          "name": "balanceLockedTime",
+          "type": "uint256"
+        },
+        {
+          "internalType": "uint256",
+          "name": "dailyProfitBps",
+          "type": "uint256"
+        },
+        {
+          "internalType": "uint256",
+          "name": "monthlyProfitBps",
+          "type": "uint256"
+        },
+        {
+          "internalType": "uint256",
+          "name": "totalROIBps",
+          "type": "uint256"
+        },
+        {
+          "internalType": "bool",
+          "name": "canReturnInvestment",
+          "type": "bool"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "renounceOwnership",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "rookiePool",
+      "outputs": [
+        {
+          "internalType": "uint256",
+          "name": "minimumInvestment",
+          "type": "uint256"
+        },
+        {
+          "internalType": "uint256",
+          "name": "maximumInvestment",
+          "type": "uint256"
+        },
+        {
+          "internalType": "uint256",
+          "name": "balanceLockedTime",
+          "type": "uint256"
+        },
+        {
+          "internalType": "uint256",
+          "name": "dailyProfitBps",
+          "type": "uint256"
+        },
+        {
+          "internalType": "uint256",
+          "name": "monthlyProfitBps",
+          "type": "uint256"
+        },
+        {
+          "internalType": "uint256",
+          "name": "totalROIBps",
+          "type": "uint256"
+        },
+        {
+          "internalType": "bool",
+          "name": "canReturnInvestment",
+          "type": "bool"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "address",
+          "name": "newOwner",
+          "type": "address"
+        }
+      ],
+      "name": "transferOwnership",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "enum HYIP.GardenTier",
+          "name": "_pool",
+          "type": "uint8"
+        }
+      ],
+      "name": "withdrawInvestment",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    }
+  ]

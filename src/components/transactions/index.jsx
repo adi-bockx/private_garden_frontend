@@ -3,7 +3,7 @@ import Breadcrumb from "../../layout/breadcrumb";
 import { Container, Row, Col, Card, CardHeader, CardBody } from "reactstrap";
 import DataTable from "react-data-table-component";
 import CountUp from "react-countup";
-import { productData, productColumns } from "../../data/product-list";
+import { TransactionsList } from "../../data/product-list";
 import {
   TransactionHistoryTitle,
   TransactionHistoryDesc,
@@ -179,16 +179,19 @@ const TransactionHistory = () => {
               </CardHeader>
               <CardBody>
                 <div className="table-responsive product-table">
-                  <DataTable
+                <TransactionsList/>
+                  {/* <DataTable
                     noHeader
                     columns={productColumns}
                     data={productData}
-                  />
+                  /> */}
                 </div>
               </CardBody>
             </Card>
           </Col>
         </Row>
+        
+
       </Container>
     </Fragment>
   );

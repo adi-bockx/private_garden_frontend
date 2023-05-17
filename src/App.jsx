@@ -6,15 +6,14 @@ import { Auth0Provider } from '@auth0/auth0-react';
 import { auth0 } from './data/config';
 import { WagmiConfig, createClient, configureChains } from 'wagmi'
 import { jsonRpcProvider } from 'wagmi/providers/jsonRpc';
-import { goerli } from 'wagmi/chains';
-// import { Profile } from './profile';
+import { polygonMumbai } from 'wagmi/chains';
 
 const { provider } = configureChains(
-  [goerli],
+  [polygonMumbai],
   [
     jsonRpcProvider({
       rpc: () => ({
-        http: "https://eth-goerli.g.alchemy.com/v2/Ia2s03luTwLOAGhgOdcFy3soe9xrfszz" // 👈 Replace this with your HTTP URL from the previous step
+        http: process.env.REACT_APP_API_URL 
       }),
     })
   ]

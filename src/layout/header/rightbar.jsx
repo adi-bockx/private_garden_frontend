@@ -127,7 +127,6 @@ const Rightbar = () => {
             </a>
           </li>
           <li>
-            {/* Wallet Connect Button */}
             <WalletButton/>
           </li>
         </ul>

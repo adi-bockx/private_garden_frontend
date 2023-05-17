@@ -6,6 +6,7 @@ import { Link } from 'react-router-dom'
 import configDB from '../../data/customizer/config';
 import { DefaultLayout } from '../theme-customizer';
 import { useTranslation } from 'react-i18next';
+//import 'dotenv/config';
 
 const Sidebar = () => {
   const id = window.location.pathname.split('/').pop()
@@ -196,7 +197,6 @@ const Sidebar = () => {
     document.querySelector(".page-header").className = "page-header close_icon";
     document.querySelector(".sidebar-wrapper").className = "sidebar-wrapper close_icon"
   }
-
   return (
     <Fragment>
       <div className={`bg-overlay1`} onClick={() => { closeOverlay() }} ></div>
