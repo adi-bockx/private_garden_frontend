@@ -110,7 +110,7 @@ export const TransactionsList = () => {
 
       data.push({
         product_name: tx.transactionHash.slice(0,12),
-        amount: tx.returnValues.amount/10e18,
+        amount: tx.returnValues.amount/10e17,
         stock: <div className='font-success'>Invested</div>,
         pay_from: "Pay with USDT",
         start_date: date.slice(0, date.indexOf(',')),
