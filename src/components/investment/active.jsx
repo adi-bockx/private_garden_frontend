@@ -13,6 +13,8 @@ import DataTable from "react-data-table-component";
 import { X } from "react-feather";
 import CountUp from "react-countup";
 import { productData, productColumns } from "../../data/product-list";
+
+import { useAccount } from 'wagmi'
 import {
   TransactionHistoryTitle,
   TransactionHistoryDesc,
@@ -26,18 +28,61 @@ import {
   Smooth,
 } from "../../constant";
 import axios from "axios";
+const HYIPABI = require('../../data/hyipAbi.json');
+const Web3 = require('web3');
+const web3 = new Web3(process.env.REACT_APP_API_URL);
+const contract = new web3.eth.Contract(HYIPABI, process.env.REACT_APP_HYIP);
 
 const TransactionHistory = () => {
+  const GardenTier = { Rookie: 0, Master: 1, Pro: 2 };
+  const { address, isConnecting, isDisconnected } = useAccount();
   const [orders, setOrders] = useState([]);
   useEffect(() => {
-    axios
-      .get(`${process.env.PUBLIC_URL}/api/orederhistory.json`)
-      .then((res) => setOrders(res.data));
+    // axios
+    //   .get(`${process.env.PUBLIC_URL}/api/orderhistory.json`)
+    //   .then((res) => setOrders(res.data));
+    queryInvestment();
   }, []);
+
+  // const products = [
+  //   { name: 'Product 1', price: 10, status: 'Active', imageUrl: '../../assets/images/ecommerce/product-table-1.png' },
+  //   { name: 'Product 2', price: 20, status: 'Inactive', imageUrl: '../../assets/images/ecommerce/product-table-2.png' },
+  //   { name: 'Product 3', price: 30, status: 'Active', imageUrl: '../../assets/images/ecommerce/product-table-3.png' },
+  // ];
+  async function queryInvestment() {
+    let results = [];
+    try {
+      // Call the mapping using the address and gardenTier as inputs
+      let result = await contract.methods.investments(address, GardenTier.Rookie).call();
+      results.push({
+        name: "Rookie Garden",
+        price: result.amount > 0? result.amount/10e17: 0,
+        status: result.amount > 0? "Active": "Inactive"
+      });
+      result = await contract.methods.investments(address, GardenTier.Master).call();
+      results.push({
+        name: "Master Garden",
+        price: result.amount > 0? result.amount/10e17: 0,
+        status: result.amount > 0? "Active": "Inactive"
+      });
+      result = await contract.methods.investments(address, GardenTier.Pro).call();
+      results.push({
+        name: "Pro Garden",
+        price: result.amount > 0? result.amount/10e17: 0,
+        status: result.amount > 0? "Active": "Inactive"
+      });
+
+      console.log(results);
+      setOrders(results);
+    } catch (error) {
+      console.error(error);
+    }
+    
+  }
 
   return (
     <Fragment>
-      <Breadcrumb parent="ECommerce" title="Active Pools" />
+      <Breadcrumb parent="ECommerce" title="Pools" />
       <Container fluid={true}>
         <Row>
           <Col sm="12">
@@ -136,35 +181,38 @@ const TransactionHistory = () => {
             </CardHeader>
           <CardBody>
             <Row>
-              <Col xl="4" md="6">
-                <div className="prooduct-details-box">
-                  <div className="media">
-                    <img
-                      className="align-self-center img-fluid img-60"
-                      src={require("../../assets/images/ecommerce/product-table-6.png")}
-                      alt="#"
-                    />
-                    <div className="media-body ms-3">
-                      <div className="product-name">
-                        <h6>
-                          <a href="#javascript">{"Pro Garden"}</a>
-                        </h6>
+              <>
+                {orders.map((product, index) => (
+                  <Col key={index} xl="4" md="6">
+                    <div className="prooduct-details-box">
+                      <div className="media">
+                        <img
+                          className="align-self-center img-fluid img-60"
+                          src={require("../../assets/images/ecommerce/product-table-6.png")}
+                          alt="#"
+                        />
+                        <div className="media-body ms-3">
+                          <div className="product-name">
+                            <h6>
+                              <a href="#javascript">{product.name}</a>
+                            </h6>
+                          </div>
+                          <div className="price d-flex">
+                            <div className="text-muted me-2">Price</div>: {product.price} USDT
+                          </div>
+                          {/* <div className="avaiabilty">
+                            <div className="text-success">+0.40%</div>
+                          </div> */}
+                          <Button color="primary" size="xs">
+                            {product.status}
+                          </Button>
+                          <X className="btn-close" />
+                        </div>
                       </div>
-                      <div className="price d-flex">
-                        <div className="text-muted me-2">{"Price"}</div>: {"50"}{" "}
-                        USDT
-                      </div>
-                      <div className="avaiabilty">
-                        <div className="text-success">{"+0.40%"}</div>
-                      </div>
-                      <Button color="primary" size="xs">
-                        {"Active"}
-                      </Button>
-                      <X className="btn-close" />
                     </div>
-                  </div>
-                </div>
-              </Col>
+                  </Col>
+                ))}
+              </>
             </Row>
           </CardBody>
         </Card>

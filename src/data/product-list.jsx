@@ -50,29 +50,6 @@ const productColumns = [
   },
 ];
 
-const productData = [
-  {
-    product_name: "AD",
-    amount: "ADI",
-    stock: <div className='font-success'>Invested</div>,
-    pay_from: "Pay with USDT",
-    start_date: "Date",
-    action: <div><span><i className="fa fa-trash" style={{ width: 35, fontSize: 16, padding: 11, color: '#e4566e' }}></i></span>
-      <span><i className="fa fa-pencil" style={{ width: 35, fontSize: 16, padding: 11, color: 'rgb(40, 167, 69)' }}></i></span>
-    </div>
-  },
-  {
-    product_name: "AD",
-    amount: "ADI",
-    stock: <div className='font-success'>Invested</div>,
-    pay_from: "Pay with USDT",
-    start_date: "Date",
-    action: <div><span><i className="fa fa-trash" style={{ width: 35, fontSize: 16, padding: 11, color: '#e4566e' }}></i></span>
-      <span><i className="fa fa-pencil" style={{ width: 35, fontSize: 16, padding: 11, color: 'rgb(40, 167, 69)' }}></i></span>
-    </div>
-  }
-]
-
 
 export const TransactionsList = () => {
   const { address, isConnecting, isDisconnected } = useAccount();
@@ -86,8 +63,6 @@ export const TransactionsList = () => {
   
   
   async function getTransactionHistory() {
-    
-
     //approval of usdt
     const transactions1 = await USDT.getPastEvents('Approval', {
       fromBlock: 0,
@@ -105,7 +80,7 @@ export const TransactionsList = () => {
 
       let obj = {
         product_name: tx.transactionHash.slice(0,12),
-        amount: tx.returnValues.value/10e18,
+        amount: tx.returnValues.value/10e17,
         stock: <div className='font-success'>Approve</div>,
         pay_from: "Pay with USDT",
         start_date: date.slice(0, date.indexOf(',')),
@@ -116,8 +91,6 @@ export const TransactionsList = () => {
       data.push(obj);
       //return data;
     }
-
-    
 
     //investment in hyip
     const transactions2 = await HYIP.getPastEvents('Invested', {

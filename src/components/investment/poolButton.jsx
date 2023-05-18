@@ -1,12 +1,12 @@
 import React from "react";
 import { Button } from "reactstrap";
 import { useContractWrite, usePrepareContractWrite } from "wagmi";
-import RookieBuyButton from "./rookieBuyPlan";
+import RookieBuyButton from "./poolBuyPlan";
 import { ethers } from 'ethers';
 
 
 
-const RookieButton = ({ rookie }) => {
+const RookieButton = ({ poolInvestment, poolType, minimum  }) => {
   const { config } = usePrepareContractWrite({
     address: "0x8B7760e6cC84A4F7eE863370C3Ca0862c2c63EF7",
     abi: [
@@ -35,7 +35,7 @@ const RookieButton = ({ rookie }) => {
         type: "function",
       },
     ],
-    args: ["0x5C96B41524BCE149729C1c7C9356fB8F17eF4422", ethers.utils.parseUnits(rookie.toString(), 18)],
+    args: ["0x5C96B41524BCE149729C1c7C9356fB8F17eF4422", ethers.utils.parseUnits(poolInvestment.toString(), 18)],
     functionName: "approve",
   });
   const { data, isLoading, isSuccess, write } = useContractWrite({...config, 
@@ -56,7 +56,7 @@ const RookieButton = ({ rookie }) => {
         <Button
           color="primary"
           size="lg"
-          disabled={!write || rookie < 50}
+          disabled={!write || poolInvestment < minimum}
           onClick={() => write?.()}
         >
           Approve USDT
@@ -66,7 +66,7 @@ const RookieButton = ({ rookie }) => {
       {isSuccess && (
         <div>
           {/* <div>USDT Allowance Transaction: {JSON.stringify(data)}</div> */}
-          <RookieBuyButton rookie={rookie} />
+          <RookieBuyButton poolInvestment={poolInvestment} poolType={poolType} minimum={minimum} />
         </div>
        
       )}

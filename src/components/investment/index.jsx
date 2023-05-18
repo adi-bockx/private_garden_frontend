@@ -22,7 +22,7 @@ import {
   BuyPlan,
 } from "../../constant";
 
-import RookieButton from "./rookieButton";
+import PoolButton from "./poolButton";
 
 const Pricing = (props) => {
   const [rookie, setRookie] = useState(0);
@@ -89,14 +89,14 @@ const Pricing = (props) => {
                         </div>
                       )}
                       <div className="pricingtable-signup">
-                        <RookieButton rookie={rookie} />
+                        <PoolButton poolInvestment={rookie} poolType={0} minimum={50} />
                       </div>
                     </div>
                   </Col>
                   <Col lg="4" md="6 box-col-6">
                     <div className="pricingtable">
                       <div className="pricingtable-header">
-                        <h3 className="title">{"Pro Garden"}</h3>
+                        <h3 className="title">{"Rookie Garden"}</h3>
                       </div>
                       <div className="price-value">
                         <span className="currency">{"USDT"}</span>
@@ -105,11 +105,11 @@ const Pricing = (props) => {
                         </span>
                       </div>
                       <ul className="pricing-content">
-                        <li>{"Min Invest 50 USDT"}</li>
+                        <li>{"Min Invest 1000 USDT"}</li>
                         <li>{"Max Invest 25,000 USDT"}</li>
-                        <li>{"Daily Profits +0.4%"}</li>
-                        <li>{"Balance Locked Time 3/month"}</li>
-                        <li>{"Initial Investment + ROI 136%"}</li>
+                        <li>{"Daily Profits +0.46%"}</li>
+                        <li>{"Balance Locked Time 6/month"}</li>
+                        <li>{"Initial Investment + ROI 184%"}</li>
                       </ul>
                       <div
                         style={{ display: "flex", justifyContent: "center" }}
@@ -123,18 +123,20 @@ const Pricing = (props) => {
                           onChange={handleProChange}
                         />
                       </div>
-
+                      {pro < 1000 && (
+                        <div style={{ color: "rgb(255 90 90)" }}>
+                          Minimum USDT Amount Should be 1000 USDT
+                        </div>
+                      )}
                       <div className="pricingtable-signup">
-                        <Button color="primary" size="lg">
-                          {BuyPlan}
-                        </Button>
+                        <PoolButton poolInvestment={pro} poolType={1} minimum={1000} />
                       </div>
                     </div>
                   </Col>
                   <Col lg="4" md="6 box-col-6">
                     <div className="pricingtable">
                       <div className="pricingtable-header">
-                        <h3 className="title">{"Master Garden"}</h3>
+                        <h3 className="title">{"Rookie Garden"}</h3>
                       </div>
                       <div className="price-value">
                         <span className="currency">{"USDT"}</span>
@@ -143,11 +145,11 @@ const Pricing = (props) => {
                         </span>
                       </div>
                       <ul className="pricing-content">
-                        <li>{"Min Invest 50 USDT"}</li>
-                        <li>{"Max Invest 25,000 USDT"}</li>
-                        <li>{"Daily Profits +0.4%"}</li>
-                        <li>{"Balance Locked Time 3/month"}</li>
-                        <li>{"Initial Investment + ROI 136%"}</li>
+                        <li>{"Min Invest 1000 USDT"}</li>
+                        <li>{"Max Invest 85,000 USDT"}</li>
+                        <li>{"Daily Profits +0.75%"}</li>
+                        <li>{"Balance Locked Time 9/month"}</li>
+                        <li>{"Initial Investment + ROI 304%"}</li>
                       </ul>
                       <div
                         style={{ display: "flex", justifyContent: "center" }}
@@ -161,14 +163,17 @@ const Pricing = (props) => {
                           onChange={handleMasterChange}
                         />
                       </div>
-
+                      {master < 1000 && (
+                        <div style={{ color: "rgb(255 90 90)" }}>
+                          Minimum USDT Amount Should be 1000 USDT
+                        </div>
+                      )}
                       <div className="pricingtable-signup">
-                        <Button color="primary" size="lg">
-                          {BuyPlan}
-                        </Button>
+                        <PoolButton poolInvestment={master} poolType={0} minimum={1000} />
                       </div>
                     </div>
                   </Col>
+                  
                 </Row>
               </CardBody>
             </Card>
