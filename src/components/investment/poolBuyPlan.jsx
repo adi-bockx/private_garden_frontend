@@ -7,20 +7,25 @@ const PoolBuyButton = ({ poolInvestment, poolType, minimum }) => {
   //const GardenTier = { Rookie: 0, Master: 1, Pro: 2 };
   //   Pool Stake Function
   const { config } = usePrepareContractWrite({
-    address: "0x5C96B41524BCE149729C1c7C9356fB8F17eF4422",
+    address: "0xcf1d455E3eeB9a6563495413DA29788836295A37",
     abi: [
       {
         "inputs": [
-        {
-          "internalType": "enum HYIP.GardenTier",
-          "name": "_pool",
-          "type": "uint8"
-        },
-        {
-          "internalType": "uint256",
-          "name": "_amount",
-          "type": "uint256"
-        }
+          {
+            "internalType": "enum HYIP.GardenTier",
+            "name": "_pool",
+            "type": "uint8"
+          },
+          {
+            "internalType": "uint256",
+            "name": "_amount",
+            "type": "uint256"
+          },
+          {
+            "internalType": "address",
+            "name": "_referrer",
+            "type": "address"
+          }
       ],
       "name": "invest",
       "outputs": [],
@@ -28,7 +33,7 @@ const PoolBuyButton = ({ poolInvestment, poolType, minimum }) => {
       "type": "function"
     },
     ],
-    args: [poolType ,ethers.utils.parseUnits(poolInvestment.toString(), 18)],
+    args: [poolType ,ethers.utils.parseUnits(poolInvestment.toString(), 18), "0x0000000000000000000000000000000000000000"],
     functionName: "invest",
   });
 
@@ -51,9 +56,9 @@ const PoolBuyButton = ({ poolInvestment, poolType, minimum }) => {
         Buy Plan
       </Button>
       {isLoading && <div>Check Wallet...</div>}
-      {isSuccess && poolType == 0 && <div>Rookie Plan Transaction: {JSON.stringify(data)}</div>}
-      {isSuccess && poolType == 1 && <div>Master Plan Transaction: {JSON.stringify(data)}</div>}
-      {isSuccess && poolType == 2 && <div>Pro Plan Transaction: {JSON.stringify(data)}</div>}
+      {isSuccess && poolType === 0 && <div>Rookie Plan Transaction: {JSON.stringify(data)}</div>}
+      {isSuccess && poolType === 1 && <div>Master Plan Transaction: {JSON.stringify(data)}</div>}
+      {isSuccess && poolType === 2 && <div>Pro Plan Transaction: {JSON.stringify(data)}</div>}
     </>
   );
 };

@@ -9,7 +9,7 @@ const spender = process.env.REACT_APP_HYIP;
 const USDT = new web3.eth.Contract(USDTABI, process.env.REACT_APP_USDT);
 const HYIP = new web3.eth.Contract(HYIPABI, process.env.REACT_APP_HYIP);
 let data = [];
-const productColumns = [
+export const productColumns = [
   {
 
     name: "Tx Hash",
@@ -51,129 +51,103 @@ const productColumns = [
 ];
 
 
-export const TransactionsList = () => {
-  const { address, isConnecting, isDisconnected } = useAccount();
-  //const [txData, setTxData] = useState();
+// export const TransactionsList = () => {
+//   const { address, isConnecting, isDisconnected } = useAccount();
+//   //const [txData, setTxData] = useState();
 
-  const [ trxData, setTrxData ] = useState([]);
+//   const [ trxData, setTrxData ] = useState([]);
+//   const [approvalSum, setApprovalSum] = useState(0);
 
-  useEffect(() => {
-     getTransactionHistory();
-  },[]);
+//   useEffect(() => {
+//      getTransactionHistory();
+//   },[]);
   
   
-  async function getTransactionHistory() {
-    //approval of usdt
-    const transactions1 = await USDT.getPastEvents('Approval', {
-      fromBlock: 0,
-      toBlock: 'latest',
-      spender: spender,
-      owner: address
-    });
+//   async function getTransactionHistory() {
+//     let totalApproval = 0;
+//     //approval of usdt
+//     const transactions1 = await USDT.getPastEvents('Approval', {
+//       fromBlock: 0,
+//       toBlock: 'latest',
+//       spender: spender,
+//       owner: address
+//     });
 
-    for (let i = 0; i < transactions1.length; i++) {
-      const tx = transactions1[i];
+//     for (let i = 0; i < transactions1.length; i++) {
+//       const tx = transactions1[i];
       
-      const block = await web3.eth.getBlock(tx.blockNumber);
-      const timestamp = block.timestamp;
-      let date = new Date(timestamp * 1000).toLocaleString();
+//       const block = await web3.eth.getBlock(tx.blockNumber);
+//       const timestamp = block.timestamp;
+//       let date = new Date(timestamp * 1000).toLocaleString();
 
-      let obj = {
-        product_name: tx.transactionHash.slice(0,12),
-        amount: tx.returnValues.value/10e17,
-        stock: <div className='font-success'>Approve</div>,
-        pay_from: "Pay with USDT",
-        start_date: date.slice(0, date.indexOf(',')),
-        action: <div><span><i className="fa fa-trash" style={{ width: 35, fontSize: 16, padding: 11, color: '#e4566e' }}></i></span>
-          <span><i className="fa fa-pencil" style={{ width: 35, fontSize: 16, padding: 11, color: 'rgb(40, 167, 69)' }}></i></span>
-        </div>
-      }
-      data.push(obj);
-      //return data;
-    }
+//       let obj = {
+//         product_name: tx.transactionHash.slice(0,12),
+//         amount: tx.returnValues.value/10e17,
+//         stock: <div className='font-success'>Approve</div>,
+//         pay_from: "Pay with USDT",
+//         // start_date: date.slice(0, date.indexOf(',')),
+//         start_date: timestamp,
+//         action: <div><span><i className="fa fa-trash" style={{ width: 35, fontSize: 16, padding: 11, color: '#e4566e' }}></i></span>
+//           <span><i className="fa fa-pencil" style={{ width: 35, fontSize: 16, padding: 11, color: 'rgb(40, 167, 69)' }}></i></span>
+//         </div>
+//       }
+//       data.push(obj);
+//       totalApproval+=tx.returnValues.value/10e17;
+//       //return data;
+//     }
 
-    //investment in hyip
-    const transactions2 = await HYIP.getPastEvents('Invested', {
-      fromBlock: 0,
-      toBlock: 'latest',
-      investor: address
-    });
+//     //investment in hyip
+//     const transactions2 = await HYIP.getPastEvents('Invested', {
+//       fromBlock: 0,
+//       toBlock: 'latest',
+//       investor: address
+//     });
 
-    for (let i = 0; i < transactions2.length; i++) {
-      const tx = transactions2[i];
+//     for (let i = 0; i < transactions2.length; i++) {
+//       const tx = transactions2[i];
       
       
-      const block = await web3.eth.getBlock(tx.blockNumber);
-      const timestamp = block.timestamp;
-      let date = new Date(timestamp * 1000).toLocaleString();
+//       const block = await web3.eth.getBlock(tx.blockNumber);
+//       const timestamp = block.timestamp;
+//       let date = new Date(timestamp * 1000).toLocaleString();
 
 
-      data.push({
-        product_name: tx.transactionHash.slice(0,12),
-        amount: tx.returnValues.amount/10e17,
-        stock: <div className='font-success'>Invested</div>,
-        pay_from: "Pay with USDT",
-        start_date: date.slice(0, date.indexOf(',')),
-        action: <div><span><i className="fa fa-trash" style={{ width: 35, fontSize: 16, padding: 11, color: '#e4566e' }}></i></span>
-          <span><i className="fa fa-pencil" style={{ width: 35, fontSize: 16, padding: 11, color: 'rgb(40, 167, 69)' }}></i></span>
-        </div>
-      });
+//       data.push({
+//         product_name: tx.transactionHash.slice(0,12),
+//         amount: tx.returnValues.amount/10e17,
+//         stock: <div className='font-success'>Invested</div>,
+//         pay_from: "Pay with USDT",
+//         //start_date: date.slice(0, date.indexOf(',')),
+//         start_date: timestamp,
+//         action: <div><span><i className="fa fa-trash" style={{ width: 35, fontSize: 16, padding: 11, color: '#e4566e' }}></i></span>
+//           <span><i className="fa fa-pencil" style={{ width: 35, fontSize: 16, padding: 11, color: 'rgb(40, 167, 69)' }}></i></span>
+//         </div>
+//       });
       
-    }
-    // console.log("data",data); 
-    setTrxData(data);
-  }
+//     }
 
-  return(
-    <DataTable columns={productColumns} data={trxData}/>
-    // <div>{txData[0].product_name}</div>
-  );
-
-}
-
+//     //sort transactions data on the basis of timestamp
+//     data.sort((a,b)=>{
+//       return b.start_date - a.start_date;
+//     });
+//     for (let i = 0 ; i < data.length; i++){
+//       let date = new Date(data[i].start_date * 1000).toLocaleString();
+//       data[i].start_date = date;
+//     }
 
 
-// export const productColumns = [
-//   {
+//     // console.log("data",data); 
+//     setTrxData(data);
+//     setApprovalSum(totalApproval);
+//   }
 
-//     name: "Tx Hash",
-//     selector: row => row.product_name,
-//     sortable: true,
-//     center: true,
-//   },
-//   {
-//     name: "Amount",
-//     selector: row => row.amount,
-//     sortable: true,
-//     center: true,
-//   },
-//   {
-//     name: "TYPE",
-//     selector: row => row.stock,
-//     sortable: true,
-//     center: true,
-//   },
-//   {
-//     name: "PAY FROM",
-//     selector: row => row.pay_from,
-//     sortable: true,
-//     center: true,
-//   },
-//   ,
-//   {
-//     name: "DATE",
-//     selector: row => row.start_date,
-//     sortable: true,
-//     center: true,
-//   },
-//   {
-//     name: "ACTION",
-//     selector: row => row.action,
-//     sortable: true,
-//     center: true,
-//   },
-// ];
-// ]
+//   return(
+//     <DataTable columns={productColumns} data={trxData}/>
+//     // <div>{txData[0].product_name}</div>
+//   );
+
+// }
+
 export const referralsData = [
   {
     user: "US000157",

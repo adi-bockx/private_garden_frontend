@@ -7,6 +7,7 @@ import {
   totalearning,
   Riskfactorchart,
 } from "./chartsData/apex-charts-data";
+import { useAccount } from 'wagmi'
 import {
   Dashboard,
   NewsUpdate,
@@ -72,9 +73,237 @@ import {
   InvestedOnFarms,
 } from "../../constant";
 import { lineChart1, lineChart2, lineChart3, barChart, radialChart, radialChartLive, progress1, progress2, progress3, progress4, progress5, columnChart, browserUses, product, turnOver, monthlySale, uses } from './charts-data'
-import Chart from 'react-apexcharts'
-
+import Chart from 'react-apexcharts';
+const HYIPABI = require('../../data/hyipAbi.json');
+const ERC20ABI = require('../../data/erc20Abi.json');
+const Web3 = require('web3');
+// const web3 = new Web3(process.env.REACT_APP_API_URL);
+// const contract = new web3.eth.Contract(HYIPABI, process.env.REACT_APP_HYIP);
+const spender = process.env.REACT_APP_HYIP;
+const web3 = new Web3('https://polygon-mumbai.g.alchemy.com/v2/z45v7nxJqTwkqQLStytSHCLG5w3pCCok');
+const contract = new web3.eth.Contract(HYIPABI, "0xcf1d455E3eeB9a6563495413DA29788836295A37");
+const pvgnContract = new web3.eth.Contract(ERC20ABI, "0x86d70eB1E9f06A8F67873d0f6020d378C35a389B");
+const usdtContract = new web3.eth.Contract(ERC20ABI, "0x8B7760e6cC84A4F7eE863370C3Ca0862c2c63EF7");
 const Sample = (props) => {
+  const GardenTier = { Rookie: 0, Master: 1, Pro: 2 };
+  const { address, isConnecting, isDisconnected } = useAccount();
+  const [ runningFunds, setRunningFunds ] = useState(0);
+  const [ claimableStakes, setClaimableStake ] = useState(0);
+  const [ timeTillNextClaim, setTimeTillNextClaim ] = useState(0);
+  const [timeTillEnd, setTimeTillEnd] = useState(0);
+  const [ airDroppedTokens, setAirDroppedTokens ]= useState(0);
+  const [ trxData, setTrxData ] = useState([]);
+  let data = [];
+
+  useEffect(() => {
+    setAirDroppedTokens(0);
+    setClaimableStake(0);
+    setRunningFunds(0);
+    setTimeTillEnd(0);
+    setTimeTillNextClaim(0);
+    data = [];
+    getTransactionHistory();
+    queryInvestment();
+  }, []);
+
+  async function queryInvestment() {
+   
+    if(address){
+      console.log("address", address);
+       //pool investments
+    try {
+      let sum = 0;
+      let claimTime = 0;
+      let nextClaimTime = 0;
+      let endTime = 0;
+      // Call the mapping using the address and gardenTier as inputs
+      let result = await contract.methods.investments(address, GardenTier.Rookie).call();
+      console.log("result" ,result);
+      sum += (result.amount/10e17);
+      endTime = result.endTime;
+      if(result.lastClaimTime == 0){
+        claimTime = result.startTime;
+        nextClaimTime = 2;
+      }
+      else {
+        claimTime = result.lastClaimTime;
+        nextClaimTime = 1; 
+      }
+
+      result = await contract.methods.investments(address, GardenTier.Master).call();
+      sum += (result.amount/10e17);
+      if(result.endTime > endTime){
+        endTime = result.endTime;
+      }
+      if(result.lastClaimTime == 0){
+        
+        if(result.startTime > claimTime){
+          nextClaimTime = 2;
+          claimTime = result.startTime;
+        }
+        
+      }
+      else {
+          if(result.lastClaimTime > claimTime){
+            nextClaimTime = 1;
+            claimTime = result.lastClaimTime;
+          }
+            
+      }
+      
+      result = await contract.methods.investments(address, GardenTier.Pro).call();
+      if(result.endTime > endTime){
+        endTime = result.endTime;
+      }
+      if(result.lastClaimTime == 0){
+        nextClaimTime = 2;
+        if(result.startTime > claimTime)
+        claimTime = result.startTime;
+      }
+      else {
+        nextClaimTime = 1;
+        if(result.lastClaimTime > claimTime)
+          claimTime = result.lastClaimTime;
+      }
+      sum += (result.amount/10e17);
+      setRunningFunds(sum);
+
+      if(claimTime != 0 && endTime != 0){
+        var DaysInSeconds = parseInt(nextClaimTime) * 24 * 60 * 60;
+        var nextTimeStamp = parseInt(claimTime) + parseInt(DaysInSeconds);
+
+        // Get the current timestamp
+        var currentTime = Math.floor(Date.now() / 1000); // Convert to seconds
+
+        // Calculate the time difference
+        var timeDifference = nextTimeStamp - currentTime ;
+
+        // Calculate the hours, minutes, and seconds
+        var hours = Math.floor(timeDifference / 3600);
+        var minutes = Math.floor((timeDifference % 3600) / 60);
+        var seconds = timeDifference % 60;
+        setTimeTillNextClaim(hours+"h:"+minutes+"m:"+seconds+"s");
+
+
+        var timeDifference1 = endTime - currentTime ;
+
+        // Calculate the hours, minutes, and seconds
+        var days = Math.floor(timeDifference1 / 86400);
+        var hours = Math.floor((timeDifference1 % 86400) / 3600);
+        var minutes = Math.floor((timeDifference1 % 3600) / 60);
+        var seconds = timeDifference1 % 60;
+
+        setTimeTillEnd(days+"d:"+hours+"h:"+minutes+"m:"+seconds+"s");
+
+        
+      }
+      else {
+        setTimeTillNextClaim("00h:00m:00s");
+      }
+
+    } catch (error) {
+      console.error("error1 ",error);
+    }
+    try {
+      let result = await contract.methods.getClaimableStake(GardenTier.Rookie, address).call();
+      result = result + await contract.methods.getClaimableStake(GardenTier.Pro, address).call();
+      result = result + await contract.methods.getClaimableStake(GardenTier.Master, address).call();  
+      setClaimableStake(result);
+      
+    } catch (error) {
+      console.error("error" ,error);
+    }
+    try {
+     let result = await pvgnContract.methods.balanceOf("0xcf1d455E3eeB9a6563495413DA29788836295A37").call();
+     result = result / 10e17;
+     result = 63000000 - result;
+     setAirDroppedTokens(result);
+      
+    } catch (error) {
+      console.error("error" ,error);
+    }
+  
+    }
+    else {
+      console.log("No address found");
+    }
+    
+  }
+  async function getTransactionHistory() {
+    //approval of usdt
+    const transactions1 = await usdtContract.getPastEvents('Approval', {
+      fromBlock: 0,
+      toBlock: 'latest',
+      spender: spender,
+      owner: address
+    });
+
+    for (let i = 0; i < transactions1.length; i++) {
+      const tx = transactions1[i];
+      
+      const block = await web3.eth.getBlock(tx.blockNumber);
+      const timestamp = block.timestamp;
+      let date = new Date(timestamp * 1000).toLocaleString();
+
+      if (tx.returnValues.value/10e17!=0) {
+        data.push({
+        product_name: tx.transactionHash.slice(0,20),
+        amount: tx.returnValues.value/10e17,
+        event: "approve" ,
+        pay_from: "USDT",
+        // start_date: date.slice(0, date.indexOf(',')),
+        start_date: timestamp,
+
+      });
+    }
+    }
+
+    //investment in hyip
+    const transactions2 = await contract.getPastEvents('Invested', {
+      fromBlock: 0,
+      toBlock: 'latest',
+      investor: address
+    });
+
+    for (let i = 0; i < transactions2.length; i++) {
+      const tx = transactions2[i];
+      
+      
+      const block = await web3.eth.getBlock(tx.blockNumber);
+      const timestamp = block.timestamp;
+      let date = new Date(timestamp * 1000).toLocaleString();
+
+
+      data.push({
+        product_name: tx.transactionHash.slice(0,20),
+        amount: tx.returnValues.amount/10e17,
+        event: "invested",
+        pay_from: "USDT",
+        //start_date: date.slice(0, date.indexOf(',')),
+        start_date: timestamp,
+      });
+      
+    }
+
+    //sort transactions data on the basis of timestamp
+    data.sort((a,b)=>{
+      return b.start_date - a.start_date;
+    });
+
+  
+
+    for (let i = 0 ; i < data.length; i++){
+      let date = new Date(data[i].start_date * 1000).toLocaleString();
+      data[i].start_date = date;
+    }
+
+    setTrxData(data.slice(0,5));
+   
+
+
+  }
+
+
   return (
     <Fragment>
       <Breadcrumb parent="Dashboard" title="Default" />
@@ -91,7 +320,7 @@ const Sample = (props) => {
                   <div className="media-body">
                     <span className="m-0">{AvailableToClaim}</span>
                     <h4 className="mb-0 counter">
-                      <CountUp end={6659} /> USDT
+                      <CountUp end={claimableStakes} /> USDT
                     </h4>
                     <Database className="icon-bg" />
                   </div>
@@ -109,7 +338,7 @@ const Sample = (props) => {
                   <div className="media-body">
                     <span className="m-0">{InvestedOnFarms}</span>
                     <h4 className="mb-0 counter">
-                      <CountUp end={9856} /> USDT
+                      <CountUp end={runningFunds} /> USDT
                     </h4>
                     <ShoppingBag className="icon-bg" />
                   </div>
@@ -127,7 +356,7 @@ const Sample = (props) => {
                   <div className="media-body">
                     <span className="m-0">{TotalCNB}</span>
                     <h4 className="mb-0 counter">
-                      <CountUp end={893} /> CNB
+                      <CountUp end={airDroppedTokens} /> PVGN
                     </h4>
                     <MessageCircle className="icon-bg" />
                   </div>
@@ -145,7 +374,7 @@ const Sample = (props) => {
                   <div className="media-body">
                     <span className="m-0">{Affiliates}</span>
                     <h4 className="mb-0 counter">
-                      <CountUp end={45} />
+                      <CountUp end={0} />
                     </h4>
                     <UserPlus className="icon-bg" />
                   </div>
@@ -172,7 +401,7 @@ const Sample = (props) => {
                         <h4 className="f-w-500 mb-0 f-26">
                           
                           <span className="counter">
-                          {"00h:05m:35s"}
+                          {timeTillNextClaim}
                           </span>
                         </h4>
                       </div>
@@ -206,7 +435,7 @@ const Sample = (props) => {
                         <h4 className="f-w-500 mb-0 f-26">
                           
                           <span className="counter">
-                          {"90D 00h:00m:30s"}
+                          {timeTillEnd}
                           </span>
                         </h4>
                       </div>
@@ -305,7 +534,7 @@ const Sample = (props) => {
                   <div className="ecommerce-widgets media">
                       <div className="media-body">
                         <p className="f-w-500 font-roboto">
-                          {"Presale Token Price"}
+                          {"PVGN Token Price"}
                           <span className="badge pill-badge-primary ms-3">
                             
                           </span>
@@ -313,7 +542,7 @@ const Sample = (props) => {
                         <h4 className="f-w-500 mb-0 f-26">
                           
                           <span className="counter">
-                          {"0.001 BNB"}
+                          {"0.0238 $"}
                           </span>
                         </h4>
                       </div>
@@ -406,29 +635,25 @@ const Sample = (props) => {
                     <div className="appointment-table table-responsive">
                       <table className="table table-bordernone">
                         <tbody>
-                          <tr>
+                        {trxData.map((data, index) => (
+                          <tr key={index}>
                             <td>
                               <img
-                                className="img-fluid img-40 rounded-circle  mb-3"
+                                className="img-fluid img-40 rounded-circle mb-3"
                                 src={require("../../assets/images/appointment/app-ent.jpg")}
                                 alt=""
                               />
-                              <div className="status-circle bg-primary"></div>
+                              <div className={"status-circle bg-primary"}></div>
                             </td>
                             <td className="img-content-box">
-                              <span className="d-block">{VenterLoren}</span>
-                              <span className="font-roboto">{"28 Sept"}</span>
+                              <span className="d-block">{data.product_name}</span>
+                              <span className="font-roboto">{data.start_date}</span>
                             </td>
                             <td className="m-0 font-primary">
-                              <span className="d-block">{"+11322.79"}</span>
-                              <span className="font-roboto">
-                                {"0.0000321 BTC"}
-                              </span>
+                              <span className="d-block">{data.amount}</span>
+                              <span className="font-roboto">{data.event}</span>
                             </td>
-
-                            {/* <td>
-                              <p className="m-0 font-primary">{"+11322.79"}</p>
-                            </td> */}
+                            {/* Add more <td> elements as needed */}
                             <td className="text-end">
                               <div className="button btn btn-primary">
                                 {Done}
@@ -436,160 +661,15 @@ const Sample = (props) => {
                               </div>
                             </td>
                           </tr>
-                          <tr>
-                            <td>
-                              <img
-                                className="img-fluid img-40 rounded-circle  mb-3"
-                                src={require("../../assets/images/appointment/app-ent.jpg")}
-                                alt=""
-                              />
-                              <div className="status-circle bg-primary"></div>
-                            </td>
-                            <td className="img-content-box">
-                              <span className="d-block">{JohnLoren}</span>
-                              <span className="font-roboto">{"22 Sept"}</span>
-                            </td>
-                            <td className="m-0 font-primary">
-                              <span className="d-block">{"-11322.79"}</span>
-                              <span className="font-roboto">
-                                {"0.0000321 BTC"}
-                              </span>
-                            </td>
-
-                            <td className="text-end">
-                              <div className="button btn btn-primary">
-                                {Done}
-                                <i className="fa fa-check-circle ms-2"></i>
-                              </div>
-                            </td>
-                          </tr>
-                          <tr>
-                            <td>
-                              <img
-                                className="img-fluid img-40 rounded-circle  mb-3"
-                                src={require("../../assets/images/appointment/app-ent.jpg")}
-                                alt=""
-                              />
-                              <div className="status-circle bg-primary"></div>
-                            </td>
-                            <td className="img-content-box">
-                              <span className="d-block">{JohnLoren}</span>
-                              <span className="font-roboto">{"22 Sept"}</span>
-                            </td>
-                            <td className="m-0 font-primary">
-                              <span className="d-block">{"+11322.79"}</span>
-                              <span className="font-roboto">
-                                {"0.0000321 BTC"}
-                              </span>
-                            </td>
-                            <td className="text-end">
-                              <div className="button btn btn-primary">
-                                {Done}
-                                <i className="fa fa-check-circle ms-2"></i>
-                              </div>
-                            </td>
-                          </tr>
-                          <tr>
-                            <td>
-                              <img
-                                className="img-fluid img-40 rounded-circle  mb-3"
-                                src={require("../../assets/images/appointment/app-ent.jpg")}
-                                alt=""
-                              />
-                              <div className="status-circle bg-primary"></div>
-                            </td>
-                            <td className="img-content-box">
-                              <span className="d-block">{JohnLoren}</span>
-                              <span className="font-roboto">{"22 Sept"}</span>
-                            </td>
-                            <td className="m-0 font-primary">
-                              <span className="d-block">{"+11322.79"}</span>
-                              <span className="font-roboto">
-                                {"0.0000321 BTC"}
-                              </span>
-                            </td>
-
-                            <td className="text-end">
-                              <div className="button btn btn-danger">
-                                {Pending}
-                                <i className="fa fa-check-circle ms-2"></i>
-                              </div>
-                            </td>
-                          </tr>
-                          <tr>
-                            <td>
-                              <img
-                                className="img-fluid img-40 rounded-circle  mb-3"
-                                src={require("../../assets/images/appointment/app-ent.jpg")}
-                                alt=""
-                              />
-                              <div className="status-circle bg-primary"></div>
-                            </td>
-                            <td className="img-content-box">
-                              <span className="d-block">{JohnLoren}</span>
-                              <span className="font-roboto">{"22 Sept"}</span>
-                            </td>
-                            <td className="m-0 font-primary">
-                              <span className="d-block">{"+11322.79"}</span>
-                              <span className="font-roboto">
-                                {"0.0000321 BTC"}
-                              </span>
-                            </td>
-
-                            <td className="text-end">
-                              <div className="button btn btn-primary">
-                                {Done}
-                                <i className="fa fa-check-circle ms-2"></i>
-                              </div>
-                            </td>
-                          </tr>
+                        ))}
                         </tbody>
                       </table>
                     </div>
                   </CardBody>
                 </Card>
               </Col>
-              {/* <Col xl="12" className="alert-sec">
-                <Card className="bg-img">
-                  <CardHeader>
-                    <div className="header-top">
-                      <h5 className="m-0">{"Alert"}  </h5>
-                      <div className="dot-right-icon"><i className="fa fa-ellipsis-h"></i></div>
-                    </div>
-                  </CardHeader>
-                  <CardBody>
-                    <div className="body-bottom">
-                      <h6>  {"10% off For drama lights Couslations..."}</h6><span className="font-roboto">{"Lorem Ipsum is simply dummy...It is a long established fact that a reader will be distracted by "} </span>
-                    </div>
-                  </CardBody>
-                </Card>
-              </Col> */}
             </Row>
           </Col>
-          {/* Notification */}
-          {/* <Col xl="4 xl-50" className="notification box-col-6">
-            <Card>
-              <CardHeader className="card-no-border">
-                <div className="header-top">
-                  <h5 className="m-0">{Notification}</h5>
-                </div>
-              </CardHeader>
-              <CardBody className="pt-0">
-                <div className="media">
-                  <div className="media-body">
-                    <p>{"20-04-2022"} <span>{"10:10"}</span></p>
-                    <h6>{"Updated Product"}<span className="dot-notification"></span></h6><span>{"Quisque a consequat ante sit amet magna..."}</span>
-                  </div>
-                </div>
-                <div className="media">
-                  <div className="media-body">
-                    <p>{"20-04-2022"}<span className="ps-1">{Today}</span><span className="badge badge-secondary">{New}</span></p>
-                    <h6>{"Tello just like your product"}<span className="dot-notification"></span></h6><span>{"Quisque a consequat ante sit amet magna... "}</span>
-                  </div>
-                </div>
-              </CardBody>
-            </Card>
-          </Col> */}
         </Row>
       </Container>
     </Fragment>

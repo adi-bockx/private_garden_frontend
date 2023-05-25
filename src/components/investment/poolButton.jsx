@@ -35,7 +35,7 @@ const RookieButton = ({ poolInvestment, poolType, minimum  }) => {
         type: "function",
       },
     ],
-    args: ["0x5C96B41524BCE149729C1c7C9356fB8F17eF4422", ethers.utils.parseUnits(poolInvestment.toString(), 18)],
+    args: ["0xcf1d455E3eeB9a6563495413DA29788836295A37", ethers.utils.parseUnits(poolInvestment.toString(), 18)],
     functionName: "approve",
   });
   const { data, isLoading, isSuccess, write } = useContractWrite({...config, 
